@@ -1,65 +1,194 @@
-# Secure and Vulnerable Web Application (PHP & MySQL)
+# SSDD-CCA: Secure Software Design & Development
 
-This project is a deliberately vulnerable web application developed using PHP and MySQL. It is designed for learning, demonstration, and testing of web application security vulnerabilities and secure coding practices.
+**NED University of Engineering & Technology | CT-477 | Spring 2026**
 
-## Project Objectives
+Demonstrates secure coding by building a PHP/MySQL web app with 5 intentional vulnerabilities and their fixes, plus automated tests.
 
-- Demonstrate common web application vulnerabilities (e.g., SQL Injection, XSS, CSRF, IDOR).
-- Provide a secure version of each vulnerable functionality.
-- Help learners understand the difference between insecure and secure code.
-- Practice penetration testing skills and secure coding in a PHP/MySQL environment.
+---
 
+## 1. Quick Start (XAMPP)
 
-## Technologies Used
+```powershell
+Copy-Item -Recurse D:\SSDD-CCA\vuln-web-app C:\xampp\htdocs\
+Copy-Item -Recurse D:\SSDD-CCA\secure-web-app C:\xampp\htdocs\
+Copy-Item D:\SSDD-CCA\.env C:\xampp\htdocs\.env
+```
 
-- **Backend:** PHP
-- **Database:** MySQL
-- **Frontend:** HTML, CSS
-- **Server:** XAMPP (Apache + MySQL)
-- **Tools for Testing:** Burp Suite, Browser Developer Tools
+1. Open XAMPP Control Panel and start Apache and MySQL.
+2. Open phpMyAdmin at http://localhost/phpmyadmin.
+3. Import `D:\SSDD-CCA\setup_databases.sql`.
+4. Open the apps:
+   - Vulnerable: http://localhost/vuln-web-app/login.php
+   - Secure: http://localhost/secure-web-app/login.php
+5. Use `admin` / `admin123` to sign in.
 
+---
 
-## Vulnerabilities Demonstrated
+## 2. Project Structure
 
-This project includes pages intentionally vulnerable to:
+```
+SSDD-CCA/
+├── .env, setup_databases.sql
+├── vuln-web-app/          # Vulnerable version
+├── secure-web-app/        # Fixed version
+└── tests/                 # 5 automated tests + runner
+    ├── run_all_tests.php
+    ├── test_sql_injection.php
+    ├── test_insecure_passwords.php
+    ├── test_idor.php
+    ├── test_xss.php
+    ├── test_brute_force.php
+    └── TESTS_README.md
+```
 
-- **SQL Injection** – Unsecured login queries.
-- **Cross-Site Scripting (XSS)** – User input reflected or stored without sanitization.
-- **Cross-Site Request Forgery (CSRF)** – No token validation for critical actions.
-- **Insecure Direct Object Reference (IDOR)** – Accessing user profiles by manipulating `id` in URL.
-- **Plaintext Password Storage** – Demonstrated in early phase (later secured).
-- **Lack of Brute-force Protection** – Demonstrated and then mitigated.
+---
 
+## 3. Deliverables
 
-## Secure Features Implemented
+- Vulnerable web app with 5 intentional flaws
+- Secure web app with the fixes applied
+- Automated test suite with 5 tests
+- Database setup script
+- Project documentation
+- Demo video to record
 
-- Password hashing using `password_hash()` and verification via `password_verify()`.
-- Prepared statements for all database queries (prevents SQLi).
-- Output encoding using `htmlspecialchars()` to prevent XSS.
-- Session-based brute-force protection using cooldown timer.
-- Secure user registration and login.
-- Restricted access to pages without authentication.
-- CSRF token mechanism added in secure version of critical forms.
+---
 
+## 4. Technologies
 
-## Setup Instructions
+- Backend: PHP 7.0+
+- Database: MySQL / MariaDB
+- Frontend: HTML5, CSS3
+- Testing: cURL and automated PHP tests
 
-1. Clone or download the repository to your local XAMPP `htdocs` directory.
-2. Start Apache and MySQL from the XAMPP control panel.
-3. Update database credentials in `/db/db_config.php` if needed.
-4. Access the app at: http://localhost/secure-web-app/login.php OR http://localhost/vuln-web-app/login.php
-5. (Optional) Use tools like **Burp Suite** to test for vulnerabilities.
+---
 
+## 5. Credentials
 
-## Testing Scenarios
+Test users for both apps:
 
-- Use XSS payloads in `form.php` in the insecure version to see reflected/stored attacks.
-- Perform SQL injection on vulnerable login page before prepared statements are applied.
-- Test brute-force login before and after protection is implemented.
-- Use Burp Suite intruder to automate brute-force or IDOR attacks.
-- Use the CSRF attack page to test unauthorized requests.
+- `admin` / `admin123`
+- `user1` / `password1`
+- `user2` / `password2`
 
+---
 
-## License
+## 6. Vulnerabilities Table (5 Total)
 
-This project is open-source and can be used for learning, training, and internal academic purposes.
+| #   | Vulnerability             | Vulnerability File          | Vulnerability                                      | Attack                                               | Fix                                               |
+| --- | ------------------------- | --------------------------- | -------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------- |
+| 1   | SQL Injection             | `vuln-web-app/login.php`    | Direct string concatenation in SQL login query     | Use `' OR '1'='1' -- ` to bypass authentication      | Use prepared statements                           |
+| 2   | Insecure Password Storage | `vuln-web-app/register.php` | Plain text passwords stored and displayed          | Read the database or profile output to see passwords | Use `password_hash()` and never display passwords |
+| 3   | IDOR                      | `vuln-web-app/profile.php`  | User-controlled `id` parameter selects any profile | Change `profile.php?id=2` to view another user       | Use the authenticated session user ID             |
+| 4   | XSS                       | `vuln-web-app/form.php`     | Comment output is not escaped                      | Submit HTML or JavaScript in a comment               | Use `htmlspecialchars()` on output                |
+| 5   | Brute Force               | `vuln-web-app/login.php`    | No limit on failed login attempts                  | Send repeated wrong passwords                        | Add rate limiting and cooldown tracking           |
+
+### SQL Injection
+
+- Vulnerability file: `vuln-web-app/login.php`
+- Vulnerability: Direct string concatenation in the SQL login query
+- Attack: Use `' OR '1'='1' -- ` to bypass authentication
+- Fix: Use prepared statements
+
+### Insecure Password Storage
+
+- Vulnerability file: `vuln-web-app/register.php`
+- Vulnerability: Plain text passwords are stored and displayed
+- Attack: Read the database or profile output to see passwords
+- Fix: Use `password_hash()` and never display passwords
+
+### IDOR
+
+- Vulnerability file: `vuln-web-app/profile.php`
+- Vulnerability: User-controlled `id` parameter selects any profile
+- Attack: Change `profile.php?id=2` to view another user
+- Fix: Use the authenticated session user ID
+
+### XSS
+
+- Vulnerability file: `vuln-web-app/form.php`
+- Vulnerability: Comment output is not escaped
+- Attack: Submit HTML or JavaScript in a comment
+- Fix: Use `htmlspecialchars()` on output
+
+### Brute Force
+
+- Vulnerability file: `vuln-web-app/login.php`
+- Vulnerability: No limit on failed login attempts
+- Attack: Send repeated wrong passwords
+- Fix: Add rate limiting and cooldown tracking
+
+---
+
+## 7. Run Automated Tests
+
+```powershell
+cd D:\SSDD-CCA\tests
+php run_all_tests.php
+```
+
+You can also run individual tests:
+
+```powershell
+php test_sql_injection.php
+php test_insecure_passwords.php
+php test_idor.php
+php test_xss.php
+php test_brute_force.php
+```
+
+---
+
+## 8. Expected Outputs
+
+The sample output below shows the result of running `run_all_tests.php`.
+For detailed per-test output, run each test script individually.
+
+```
+======================================================================
+SSDD-CCA PROJECT - SECURITY VULNERABILITY TEST SUITE
+======================================================================
+
+[Running Test: SQL Injection]
+[PASS] TEST PASSED: Vulnerability confirmed in vulnerable app, fixed in secure app
+File: `test_sql_injection.php`
+
+[Running Test: Insecure Password Storage]
+[PASS] TEST PASSED: Vulnerability confirmed in vulnerable app, fixed in secure app
+File: `test_insecure_passwords.php`
+
+[Running Test: IDOR (Insecure Direct Object Reference)]
+[PASS] TEST PASSED: Vulnerability confirmed in vulnerable app, fixed in secure app
+File: `test_idor.php`
+
+[Running Test: Cross-Site Scripting (XSS)]
+[PASS] TEST PASSED: Vulnerability confirmed in vulnerable app, fixed in secure app
+File: `test_xss.php`
+
+[Running Test: Brute Force Attack]
+[PASS] TEST PASSED: Vulnerability confirmed in vulnerable app, fixed in secure app
+File: `test_brute_force.php`
+
+======================================================================
+TEST EXECUTION SUMMARY
+======================================================================
+[PASS] SQL Injection (`test_sql_injection.php`)
+[PASS] Insecure Password Storage (`test_insecure_passwords.php`)
+[PASS] IDOR (Insecure Direct Object Reference) (`test_idor.php`)
+[PASS] Cross-Site Scripting (XSS) (`test_xss.php`)
+[PASS] Brute Force Attack (`test_brute_force.php`)
+
+Results: 5 Passed | 0 Failed | 0 Errors (Total: 5)
+======================================================================
+[PASS] ALL TESTS PASSED!
+```
+
+---
+
+## 9. Academic Information
+
+- Institution: NED University of Engineering & Technology
+- Department: Computer Science & Information Technology
+- Course: CT-477 - Secure Software Design & Development
+- Semester: Spring 2026
+- Submission Deadline: May 17th, 2026
