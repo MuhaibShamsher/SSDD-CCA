@@ -7,7 +7,6 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
-// Fetch comments
 $sql = "SELECT comment FROM comments ORDER BY id DESC";
 $result = $conn->query($sql);
 

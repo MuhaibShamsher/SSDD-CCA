@@ -1,13 +1,11 @@
 <?php
 session_start();
 
-// Ensure user is authenticated
 if (!isset($_SESSION['username']) || !isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
-// Set secure headers
 header("Content-Type: text/html; charset=UTF-8");
 header("X-Content-Type-Options: nosniff");
 header("X-Frame-Options: SAMEORIGIN");

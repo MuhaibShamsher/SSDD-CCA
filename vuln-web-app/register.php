@@ -1,16 +1,13 @@
 <?php
-// Insecure DB config
 $conn = new mysqli("localhost", "root", "", "vuln_web_app");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username']; // No validation or sanitization
     $password = $_POST['password']; // Stored as plain text
 
-    // Vulnerable SQL query (SQL Injection possible)
     $sql = "INSERT INTO users (username, password) VALUES ('$username', '$password')";
 
     if ($conn->query($sql) === TRUE) {

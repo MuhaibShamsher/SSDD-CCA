@@ -7,7 +7,6 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
-// Validate and sanitize input
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!isset($_POST['comment']) || empty(trim($_POST['comment']))) {
         die("Comment cannot be empty.");
@@ -15,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $comment = trim($_POST['comment']);
 
-    // Use prepared statement to prevent SQL injection
     $stmt = $conn->prepare("INSERT INTO comments (comment) VALUES (?)");
     $stmt->bind_param("s", $comment);
 

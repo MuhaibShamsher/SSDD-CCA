@@ -2,16 +2,13 @@
 session_start();
 require_once('db/db_config.php');
 
-// Ensure the user is authenticated
 if (!isset($_SESSION['username']) || !isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
-// Always use the session user ID instead of GET to avoid IDOR
 $user_id = $_SESSION['user_id'];
 
-// Use prepared statement to prevent SQL injection
 $stmt = $conn->prepare("SELECT id, username FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -24,7 +21,6 @@ if ($result && $result->num_rows > 0) {
     exit();
 }
 
-// Optional: Close statement and connection
 $stmt->close();
 $conn->close();
 ?>

@@ -9,13 +9,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
-    // Basic validation
     if (empty($username) || empty($password)) {
         $error = "Username and password are required.";
     } elseif (strlen($password) < 6) {
         $error = "Password must be at least 6 characters long.";
     } else {
-        // Check if username already exists
         $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
@@ -26,10 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $stmt->close();
 
-            // Hash the password securely
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-            // Insert new user
             $stmt = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
             $stmt->bind_param("ss", $username, $hashedPassword);
 
